@@ -72,7 +72,6 @@ void loop() {
   } else {
     // Si el boton de [panico] no esta presionado, la ALARMA se controla por la distancia
   }
-
   // Pequeño retardo para estabilizar lecturas y no saturar el Monitor Serial
   delay(50);
 }
