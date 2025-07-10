@@ -1,0 +1,78 @@
+// Definiciones de pines
+const int TRIGGER_PIN = 2;   // Pin para enviar el pulso ultrasonico
+const int ECHO_PIN = 3;      // Pin para recibir el eco ultrasonico
+const int VIBRADOR_PIN = 5;  // Pin para el módulo vibrador
+const int LED_PIN = 6;       // Pin para el led de LED (puedes cambiarlo por un zumbador si lo prefieres)
+const int BOTON_PANICO_PIN = 7; // Pin para el boton de [panico]
+
+// Función para leer la distancia del sensor ultrasonico
+long readUltrasonicDistance(int triggerPin, int echoPin) {
+  digitalWrite(triggerPin, LOW);
+  delayMicroseconds(2);
+
+  // Envía un pulso alto por 10 microsegundos
+  digitalWrite(triggerPin, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(triggerPin, LOW);
+  return pulseIn(echoPin, HIGH);
+}
+
+void setup() {
+  Serial.begin(9600);
+
+  // Configura los pines de salida
+  pinMode(TRIGGER_PIN, OUTPUT);
+  pinMode(VIBRADOR_PIN, OUTPUT);
+  pinMode(LED_PIN, OUTPUT);
+
+  // Configura los pines de entrada
+  pinMode(ECHO_PIN, INPUT); // El pin ECHO es de entrada
+  pinMode(BOTON_PANICO_PIN, INPUT); // El boton de [panico] es de entrada (se asume un pull-down externo o interno)
+}
+
+void loop() {
+  // --- Lógica del Sensor de Distancia ---
+
+  // Calcula la duración del pulso de eco en microsegundos
+  long duration = readUltrasonicDistance(TRIGGER_PIN, ECHO_PIN);
+
+  // Convierte la duración a distancia en centímetros
+  // El sonido viaja y regresa, así que dividimos por 2.
+  // (duración * 0.0343 cm/microsegundo) / 2 = duración * 0.01715 cm/microsegundo
+  float distanceCm = duration * 0.01723; // Usamos 0.01723 para mayor precisión en este ejemplo
+
+  // Imprime la distancia en el Monitor Serial para depuración
+  Serial.print("Distancia: ");
+  Serial.print(distanceCm);
+  Serial.println(" cm");
+
+  // Activa la ALARMA si la distancia es menor a 30 cm
+  if (distanceCm < 30 && distanceCm > 0) { // Añadimos distanceCm > 0 para evitar lecturas erróneas cuando no hay eco
+    digitalWrite(VIBRADOR_PIN, HIGH); // Enciende el vibrador
+    digitalWrite(LED_PIN, HIGH);      // Enciende el alarma de ALARMA
+    Serial.println("ALARMA de proximidad activada!");
+  } else {
+    digitalWrite(VIBRADOR_PIN, LOW);  // Apaga el vibrador
+    digitalWrite(LED_PIN, LOW);       // Apaga el alarma de ALARMA
+  }
+
+
+  // Lee el estado del boton de [panico]
+  int panicButtonState = digitalRead(BOTON_PANICO_PIN);
+
+  // Imprime el estado del boton de [panico] en el Monitor Serial
+  Serial.print("Boton de panico: ");
+  Serial.println(panicButtonState);
+
+  // Si el botan de panico esta presionado, activa la ALARMA de forma continua
+  if (panicButtonState == HIGH) {
+    digitalWrite(VIBRADOR_PIN, HIGH); // Enciende el vibrador
+    digitalWrite(LED_PIN, HIGH);      // Enciende la alarma de ALARMA
+    Serial.println("BOTON DE [panico] PRESIONADO!");
+  } else {
+    // Si el boton de [panico] no esta presionado, la ALARMA se controla por la distancia
+  }
+
+  // Pequeño retardo para estabilizar lecturas y no saturar el Monitor Serial
+  delay(50);
+}
