@@ -1,7 +1,7 @@
 // Definiciones de pines
 const int TRIGGER_PIN = 2;   // Pin para enviar el pulso ultrasonico
 const int ECHO_PIN = 3;      // Pin para recibir el eco ultrasonico
-const int VIBRADOR_PIN = 5;  // Pin para el módulo vibrador
+const int BUZZER_PIN = 5;  // Pin para el módulo zumbador
 const int LED_PIN = 6;       // Pin para el led de LED (puedes cambiarlo por un zumbador si lo prefieres)
 const int BOTON_PANICO_PIN = 7; // Pin para el boton de [panico]
 
@@ -22,7 +22,7 @@ void setup() {
 
   // Configura los pines de salida
   pinMode(TRIGGER_PIN, OUTPUT);
-  pinMode(VIBRADOR_PIN, OUTPUT);
+  pinMode(BUZZER_PIN, OUTPUT);
   pinMode(LED_PIN, OUTPUT);
 
   // Configura los pines de entrada
@@ -48,11 +48,11 @@ void loop() {
 
   // Activa la ALARMA si la distancia es menor a 30 cm
   if (distanceCm < 30 && distanceCm > 0) { // Añadimos distanceCm > 0 para evitar lecturas erróneas cuando no hay eco
-    digitalWrite(VIBRADOR_PIN, HIGH); // Enciende el vibrador
+    digitalWrite(BUZZER_PIN, HIGH); // Enciende el zumbador
     digitalWrite(LED_PIN, HIGH);      // Enciende el alarma de ALARMA
     Serial.println("ALARMA de proximidad activada!");
   } else {
-    digitalWrite(VIBRADOR_PIN, LOW);  // Apaga el vibrador
+    digitalWrite(BUZZER_PIN, LOW);  // Apaga el zumbador
     digitalWrite(LED_PIN, LOW);       // Apaga el alarma de ALARMA
   }
 
@@ -66,12 +66,13 @@ void loop() {
 
   // Si el botan de panico esta presionado, activa la ALARMA de forma continua
   if (panicButtonState == HIGH) {
-    digitalWrite(VIBRADOR_PIN, HIGH); // Enciende el vibrador
+    digitalWrite(BUZZER_PIN, HIGH); // Enciende el zumbador
     digitalWrite(LED_PIN, HIGH);      // Enciende la alarma de ALARMA
     Serial.println("BOTON DE [panico] PRESIONADO!");
   } else {
     // Si el boton de [panico] no esta presionado, la ALARMA se controla por la distancia
   }
+
   // Pequeño retardo para estabilizar lecturas y no saturar el Monitor Serial
   delay(50);
 }
